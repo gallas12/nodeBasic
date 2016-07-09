@@ -1,18 +1,25 @@
 /**
  * Created by Milan Gallas on 9.7.2016.
  */
-var http = require('http'); //nahraji http modul
-var module1 = require('./module1'); //importuji soubor module1.js
-var module2 = require('./module2'); //importuji soubor module1.js
+var http = require('http');
+var fs = require('fs'); //znázornění html
 
 
-
-
-http.createServer(
-    function onRequest(request, response){
-        response.writeHead(200, {'Content-Type': 'text/plain'});
-        response.write(module2.maVariable); //vypíšu proměnou z mého modulu
-        module1.myFunction(); //zavolám funkci pro logování
+function onRequest(request, response){
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    fs.readFile('./index.html', null, function(error, data){
+        if(error){
+            response.writeHead(404);
+            response.write('File not found');
+        }else{
+            response.write(data);
+        }
+        //response ukončím až zde ve vnořeném bloku. Ten vnější musí být zakomentován,
+        // jinak response končí dřív a nemůžu použít write metodu
         response.end();
-    }
-).listen(8000);
+    });
+    //ukončím hlavní blok
+    //response.end();
+}
+
+http.createServer(onRequest).listen(8000);
